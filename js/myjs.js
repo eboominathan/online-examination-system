@@ -98,16 +98,21 @@ function dis(mins,secs) {
   } else {
       disp += secs;
   }
+
   return(disp);
 }
 
 function redo() {
+ 
   secs--;
   if(secs == -1) {
       secs = 59;
       mins--;
   }
   document.cd.disp.value = dis(mins,secs); 
+  $('#timeExamLimit').val(mins+":"+secs);
+  localStorage.setItem('timeExamLimit', $(mins+":"+secs));
+
   if((mins == 0) && (secs == 0)) {
     $('#examAction').val("autoSubmit");
      $('#submitAnswerFrm').submit();
@@ -117,6 +122,8 @@ function redo() {
 }
 
 function init() {
-  cd();
+  cd(); 
 }
-window.onload = init;
+setTimeout(function(){
+  init();
+},3000);
