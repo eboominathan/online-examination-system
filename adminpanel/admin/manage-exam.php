@@ -119,98 +119,82 @@ if(!isset($_SESSION['admin']['adminnakalogin']) == true) header("location:index.
                             <div class="scroll-area-sm" style="min-height: 400px;">
                                <div class="scrollbar-container">
 
-                            <?php 
-                               
-                               if($selQuest->rowCount() > 0)
-                               {  ?>
-                                 <div class="table-responsive">
-                                    <table class="align-middle mb-0 table table-borderless table-striped table-hover" id="tableList">
-                                        <thead>
-                                        <tr>
-                                            <th class="text-left pl-1">Course Name</th>
-                                            <th class="text-center" width="20%">Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                          <?php 
-                                            
-                                            if($selQuest->rowCount() > 0)
-                                            {
-                                               $i = 1;
-                                               while ($selQuestionRow = $selQuest->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <tr>
-                                                        <td >
-                                                            <b><?php echo $i++ ; ?> .) <?php echo $selQuestionRow['exam_question']; ?></b><br>
-                                                            <?php 
-                                                              // Choice A
-                                                              if($selQuestionRow['exam_ch1'] == $selQuestionRow['exam_answer'])
-                                                              { ?>
-                                                                <span class="pl-4 text-success">A - <?php echo  $selQuestionRow['exam_ch1']; ?></span><br>
-                                                              <?php }
-                                                              else
-                                                              { ?>
-                                                                <span class="pl-4">A - <?php echo $selQuestionRow['exam_ch1']; ?></span><br>
-                                                              <?php }
+                               <?php 
+if ($selQuest->rowCount() > 0) {  
+?>
+    <div class="table-responsive">
+        <table class="align-middle mb-0 table table-bordered table-striped table-hover" id="tableList">
+            <thead class="bg-primary text-white">
+                <tr>
+                    <th class="text-left pl-3">#</th>
+                    <th class="text-left">Question</th>
+                    <th class="text-left">Choices</th>
+                    <th class="text-center" width="20%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                $i = 1;
 
-                                                              // Choice B
-                                                              if($selQuestionRow['exam_ch2'] == $selQuestionRow['exam_answer'])
-                                                              { ?>
-                                                                <span class="pl-4 text-success">B - <?php echo $selQuestionRow['exam_ch2']; ?></span><br>
-                                                              <?php }
-                                                              else
-                                                              { ?>
-                                                                <span class="pl-4">B - <?php echo $selQuestionRow['exam_ch2']; ?></span><br>
-                                                              <?php }
+                 // Function to display choices with highlighting for correct answer
+                 function displayChoice($choice, $isCorrect, $label,$mark,$desc) {
+                  if ($isCorrect) {
+                      echo "<div class='pl-4'><span class='badge badge-success p-2'><b>$label - $choice ✅</b> ( Mark - $mark Desc - $desc ) </span></div>";
+                  } else {
+                      echo "<div class='pl-4'><span class='text-dark'>$label - $choice ( Mark - $mark Desc - $desc )</span></div>";
+                  }
+              }
 
-                                                              // Choice C
-                                                              if($selQuestionRow['exam_ch3'] == $selQuestionRow['exam_answer'])
-                                                              { ?>
-                                                                <span class="pl-4 text-success">C - <?php echo $selQuestionRow['exam_ch3']; ?></span><br>
-                                                              <?php }
-                                                              else
-                                                              { ?>
-                                                                <span class="pl-4">C - <?php echo $selQuestionRow['exam_ch3']; ?></span><br>
-                                                              <?php }
+                while ($selQuestionRow = $selQuest->fetch(PDO::FETCH_ASSOC)) { ?>
+                    <tr>
+                        <td class="font-weight-bold text-center"><?php echo $i++; ?>.</td>
+                        <td><b><?php echo $selQuestionRow['exam_question']; ?></b></td>
+                        <td>
+                            <?php
+                           
 
-                                                              // Choice D
-                                                              if($selQuestionRow['exam_ch4'] == $selQuestionRow['exam_answer'])
-                                                              { ?>
-                                                                <span class="pl-4 text-success">D - <?php echo $selQuestionRow['exam_ch4']; ?></span><br>
-                                                              <?php }
-                                                              else
-                                                              { ?>
-                                                                <span class="pl-4">D - <?php echo $selQuestionRow['exam_ch4']; ?></span><br>
-                                                              <?php }
+                            displayChoice(
+                                $selQuestionRow['exam_ch1'], 
+                                $selQuestionRow['exam_answer'] == 'A', 
+                                'A',
+                                $selQuestionRow['exam_ch1_mark'],$selQuestionRow['exam_ch1_desc']
+                            );
 
-                                                             ?>
-                                                            
-                                                        </td>
-                                                        <td class="text-center">
-                                                         <a rel="facebox" href="facebox_modal/updateQuestion.php?id=<?php echo $selQuestionRow['eqt_id']; ?>" class="btn btn-sm btn-primary">Update</a>
-                                                         <button type="button" id="deleteQuestion" data-id='<?php echo $selQuestionRow['eqt_id']; ?>'  class="btn btn-danger btn-sm">Delete</button>
-                                                        </td>
-                                                    </tr>
-                                               <?php }
-                                            }
-                                            else
-                                            { ?>
-                                                <tr>
-                                                  <td colspan="2">
-                                                    <h3 class="p-3">No Course Found</h3>
-                                                  </td>
-                                                </tr>
-                                            <?php }
-                                           ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                               <?php }
-                               else
-                               { ?>
-                                  <h4 class="text-primary">No question found...</h4>
-                                 <?php
-                               }
-                             ?>
+                            displayChoice(
+                                $selQuestionRow['exam_ch2'], 
+                                $selQuestionRow['exam_answer'] == 'B', 
+                                'B',
+                                $selQuestionRow['exam_ch2_mark'],$selQuestionRow['exam_ch2_desc']
+                            );
+
+                            displayChoice(
+                                $selQuestionRow['exam_ch3'], 
+                                $selQuestionRow['exam_answer'] == 'C', 
+                                'C',
+                                $selQuestionRow['exam_ch3_mark'],$selQuestionRow['exam_ch3_desc']
+                            );
+
+                            displayChoice(
+                                $selQuestionRow['exam_ch4'], 
+                                $selQuestionRow['exam_answer'] == 'D', 
+                                'D',
+                                $selQuestionRow['exam_ch4_mark'],$selQuestionRow['exam_ch4_desc']
+                            );
+                            ?>
+                        </td>
+                        <td class="text-center">
+                            <a rel="facebox" href="facebox_modal/updateQuestion.php?id=<?php echo $selQuestionRow['eqt_id']; ?>" class="btn btn-sm btn-primary">✏ Update</a>
+                            <button type="button" id="deleteQuestion" data-id='<?php echo $selQuestionRow['eqt_id']; ?>' class="btn btn-danger btn-sm">🗑 Delete</button>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
+    </div>
+<?php } else { ?>
+    <h4 class="text-primary p-3">No questions found...</h4>
+<?php } ?>
+
                                </div>
                             </div>
 
