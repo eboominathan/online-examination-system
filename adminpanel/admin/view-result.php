@@ -90,20 +90,16 @@ function getMarkDesc($array)
         'C' => ['mark' => 'exam_ch3_mark', 'desc' => 'exam_ch3_desc'],
         'D' => ['mark' => 'exam_ch4_mark', 'desc' => 'exam_ch4_desc'],
     ];
-    if ($array['exans_answer'] == $array['exam_ch1_mark']) {
-        $choice = 'A';
-    }
-    if ($array['exans_answer'] == $array['exam_ch2_mark']) {
-        $choice = 'B';
-    }
-    if ($array['exans_answer'] == $array['exam_ch3_mark']) {
-        $choice = 'C';
-    }
-    if ($array['exans_answer'] == $array['exam_ch4_mark']) {
-        $choice = 'D';
+
+    $choice = null;
+    foreach ($mapping as $key => $fields) {
+        if ($array['exans_answer'] == $array[$fields['mark']]) {
+            $choice = $key;
+            break;
+        }
     }
 
-    if (isset($mapping[$choice])) {
+    if ($choice !== null) {
         return [
             'mark' => $array[$mapping[$choice]['mark']],
             'desc' => $array[$mapping[$choice]['desc']]
@@ -112,5 +108,6 @@ function getMarkDesc($array)
 
     return ['mark' => 0, 'desc' => ''];
 }
+
 
 ?>
