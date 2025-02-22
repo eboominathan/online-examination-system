@@ -35,25 +35,35 @@
                                  <?php
                                     $selQuest = $conn->query("SELECT * FROM exam_question_tbl eqt INNER JOIN exam_answers ea ON eqt.eqt_id = ea.quest_id WHERE eqt.exam_id='$examId' AND ea.axmne_id='$exmneId' AND ea.exans_status='new' ");
                                     $i = 1;
-                                    while ($selQuestRow = $selQuest->fetch(PDO::FETCH_ASSOC)) { ?>
-                                     <tr>
-                                         <td>
-                                             <b>
-                                                 <p><?php echo $i++; ?> .) <?php echo $selQuestRow['exam_question']; ?></p>
-                                             </b>
-                                             <label class="pl-4 text-success">
-                                                 Answer :
-                                                 <?php
+                                    $totalMark = [];
+                                    while ($selQuestRow = $selQuest->fetch(PDO::FETCH_ASSOC)) {
+                                        $data = getMarkDesc($selQuestRow);
+                                    ?>
+                                 <tr>
+                                     <td>
+                                         <b>
+                                             <p><?php echo $i++; ?> .) <?php echo $selQuestRow['exam_question']; ?></p>
+                                         </b>
+                                         <label class="pl-4 text-success">
+                                             Answer :
+                                             <?php
                                                     if ($selQuestRow['exam_answer'] != $selQuestRow['exans_answer']) { ?>
-                                                     <span style="color:red"><?php echo $selQuestRow['exans_answer']; ?></span>
-                                                 <?PHP } else { ?>
-                                                     <span
-                                                         class="text-success"><?php echo $selQuestRow['exans_answer']; ?></span>
-                                                 <?php }
+                                             <span style="color:red"><?php echo $selQuestRow['exans_answer']; ?></span>
+                                             <?PHP } else { ?>
+                                             <span
+                                                 class="text-success"><?php echo $selQuestRow['exans_answer']; ?></span>
+                                             <?php }
                                                     ?>
-                                             </label>
-                                         </td>
-                                     </tr>
+                                         </label>
+
+                                         <label class="text-info">Mark :</label>
+                                         <?php echo $data['mark'];
+                                                $totalMark[] = $data['mark']; ?></b>
+
+
+
+                                     </td>
+                                 </tr>
                                  <?php }
                                     ?>
                              </table>
@@ -61,13 +71,13 @@
                      </div>
                  </div>
 
-                 <!-- <div class="col-md-6 float-left">
+                 <div class="col-md-6 float-left">
                      <div class="col-md-6 float-left">
                          <div class="card mb-3 widget-content bg-night-fade">
                              <div class="widget-content-wrapper text-white">
                                  <div class="widget-content-left">
                                      <div class="widget-heading">
-                                         <h5>Score</h5>
+                                         <h5>Total Score</h5>
                                      </div>
                                      <div class="widget-subheading" style="color: transparent;">/</div>
                                  </div>
@@ -77,18 +87,19 @@
                                             $selScore = $conn->query("SELECT * FROM exam_question_tbl eqt INNER JOIN exam_answers ea ON eqt.eqt_id = ea.quest_id AND eqt.exam_answer = ea.exans_answer  WHERE ea.axmne_id='$exmneId' AND ea.exam_id='$examId' AND ea.exans_status='new' ");
                                             ?>
                                          <span>
-                                             <?php echo $selScore->rowCount(); ?>
-                                             <?php
-                                                $over  = $selExam['ex_questlimit_display'];
+                                             <?php if (!empty($totalMark)) {
+                                                    echo array_sum($totalMark);
+                                                }
                                                 ?>
-                                         </span> / <?php echo $over; ?>
+
+                                         </span>
                                      </div>
                                  </div>
                              </div>
                          </div>
                      </div>
 
-                     <div class="col-md-6 float-left">
+                     <!-- <div class="col-md-6 float-left">
                          <div class="card mb-3 widget-content bg-happy-green">
                              <div class="widget-content-wrapper text-white">
                                  <div class="widget-content-left">
@@ -104,10 +115,10 @@
                                             ?>
                                          <span>
                                              <?php
-                                                $score = $selScore->rowCount();
-                                                $ans = $score / $over * 100;
-                                                echo "$ans";
-                                                echo "%";
+                                                // $score = $selScore->rowCount();
+                                                // $ans = $score / $over * 100;
+                                                // echo "$ans";
+                                                // echo "%";
 
                                                 ?>
                                          </span>
@@ -117,8 +128,38 @@
                          </div>
                      </div>
                  </div> -->
+                 </div>
+
+
              </div>
-
-
          </div>
-     </div>
+
+         <?php
+            function getMarkDesc($array)
+            {
+                $mapping = [
+                    'A' => ['mark' => 'exam_ch1_mark', 'desc' => 'exam_ch1_desc'],
+                    'B' => ['mark' => 'exam_ch2_mark', 'desc' => 'exam_ch2_desc'],
+                    'C' => ['mark' => 'exam_ch3_mark', 'desc' => 'exam_ch3_desc'],
+                    'D' => ['mark' => 'exam_ch4_mark', 'desc' => 'exam_ch4_desc'],
+                ];
+
+                $choice = null;
+                foreach ($mapping as $key => $fields) {
+                    if ($array['exans_answer'] == $array[$fields['mark']]) {
+                        $choice = $key;
+                        break;
+                    }
+                }
+
+                if ($choice !== null) {
+                    return [
+                        'mark' => $array[$mapping[$choice]['mark']],
+                        'desc' => $array[$mapping[$choice]['desc']]
+                    ];
+                }
+
+                return ['mark' => 0, 'desc' => ''];
+            }
+
+            ?>
